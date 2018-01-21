@@ -1,6 +1,7 @@
 FROM ubuntu:17.10
 
-#RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
+    python
 #    mongodb \
 #    net-tools \
 #    nodejs \
@@ -9,6 +10,6 @@ FROM ubuntu:17.10
 
 #RUN systemctl enable mongodb.service
 
-# EXPOSE 3000
+EXPOSE 8080
 
 ENTRYPOINT ["/bin/bash"]
