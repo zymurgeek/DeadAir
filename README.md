@@ -13,6 +13,7 @@ cd /opt/DeadAir
 # View the site
    `docker ps`
 to get the container ID.
+
    `docker inspect {container ID} | grep IPAddress`
 
 Browse to:
