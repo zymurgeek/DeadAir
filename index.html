@@ -1,17 +1,29 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <HTML xmlns="http://www.w3.org/1999/xhtml">
   <HEAD>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>DeadAir</title>
+    <title>Dead Air</title>
   </HEAD>
   <BODY>
-    <!--iframe> width="560" height="315" src="https://www.youtube.com/embed/4ny_Wl4kRJM?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe-->
+    <!-- https://developers.google.com/youtube/iframe_api_reference -->
+    <!--iframe>
+      width="560"
+      height="315"
+      src="https://www.youtube.com/embed/4ny_Wl4kRJM?rel=0"
+      frameborder="0"
+      allow="autoplay; encrypted-media" allowfullscreen>
+    </iframe-->
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div>
 
     <script>
+      var playerQueue = {
+        ids: [],
+        index: 0,
+      };
+
       // 2. This code loads the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
 
@@ -42,17 +54,74 @@
       // 5. The API calls this function when the player's state changes.
       //    The function indicates that when playing a video (state=1),
       //    the player should play for six seconds and then stop.
-      var done = false;
       function onPlayerStateChange(event) {
-        console.log('onPlayerStateChange event=', event);
-        if (event.data == YT.PlayerState.PLAYING && !done) {
-          //setTimeout(stopVideo, 6000);
-          //done = true;
+        console.log('onPlayerStateChange event=', getPlayerStateName());
+        if (event.data == YT.PlayerState.ENDED) {
+            playNextVideoInQueue();
+        }
+        if (event.data == YT.PlayerState.CUED) {
+          player.playVideo();
+        }
+
+        showQueue();
+      }
+
+      function playNextVideoInQueueIfNotPlaying() {
+        if (player.getPlayerState() == YT.PlayerState.ENDED) {
+          playNextVideoInQueue();
+        } else {
+          console.log('Video is already playing');
         }
       }
+
+      function playNextVideoInQueue() {
+        if (playerQueue.ids.length > playerQueue.index) {
+            player.cueVideoById(playerQueue.ids[playerQueue.index], 0, 'default');
+            playerQueue.index++;
+        } else {
+          console.log('No more videos to play');
+        }
+      }
+
+      function getPlayerStateName() {
+        if (player.getPlayerState() == -1) {
+          return 'UNSTARTED';
+        }
+        if (player.getPlayerState() == 0) {
+          return 'ENDED';
+        }
+        if (player.getPlayerState() == 1) {
+          return 'PLAYING';
+        }
+        if (player.getPlayerState() == 2) {
+          return 'PAUSED';
+        }
+        if (player.getPlayerState() == 3) {
+          return 'BUFFERING';
+        }
+        if (player.getPlayerState() == 5) {
+          return 'CUED';
+        }
+      }
+
       function stopVideo() {
         player.stopVideo();
       }
+
+      function queueVideo(id) {
+        playerQueue.ids.push(id);
+        playNextVideoInQueueIfNotPlaying();
+        showQueue();
+      }
+
+      function showQueue() {
+        console.log("Current queue: ", playerQueue);
+      }
     </script>
+    YouTube Video ID: <input type="text" id="videoId">
+    <button type="button"
+        onclick="queueVideo(document.getElementById('videoId').value)">
+      Add to queue
+    </button>
   </BODY>
 </HTML>

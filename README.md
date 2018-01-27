@@ -17,4 +17,4 @@ to get the container ID.
    `docker inspect {container ID} | grep IPAddress`
 
 Browse to:
-       http://{container IP address}
+       http://{container IP address}:8080
