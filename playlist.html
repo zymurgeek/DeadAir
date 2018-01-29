@@ -10,8 +10,9 @@
     <!-- https://developers.google.com/youtube/iframe_api_reference -->
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div>
-
+    <div id="playlistinfo"></div>
     <script>
+      var playlistId = 'PLIhsL76FAVWRB6jgvbCpiT8cCnyHSwmn1';
       var INITIAL_LOAD = 'INITIAL_LOAD';
       var PLAYING = 'PLAYING';
       var RELOADING_PLAYLIST = 'RELOADING_PLAYLIST';
@@ -24,6 +25,11 @@
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+      var playlistUrl = 'https://www.youtube.com/playlist?list=' + playlistId;
+      var playlistInfo = 'Add videos to the play list at '
+        + '<a href="' + playlistUrl + '">' + playlistUrl + '</a>';
+      var playlistInfoDiv = document.getElementById('playlistinfo');
+      playlistInfoDiv.insertAdjacentHTML( 'beforeend', playlistInfo);
       // 3. This function creates an <iframe> (and YouTube player)
       //    after the API code downloads.
       var player;
@@ -125,7 +131,7 @@
         }
         player.cuePlaylist({
           listType: 'playlist',
-          list: 'PLIhsL76FAVWRB6jgvbCpiT8cCnyHSwmn1',
+          list: playlistId,
           index: index});
       }
     </script>
