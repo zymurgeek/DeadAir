@@ -13,6 +13,7 @@
     <div id="playlistinfo"></div>
     <script>
       var playlistId = 'PLIhsL76FAVWRB6jgvbCpiT8cCnyHSwmn1';
+      var editable = '&jct=68mng4z2XIFtkdMNqIdcVItSvhxeaw';
       var INITIAL_LOAD = 'INITIAL_LOAD';
       var PLAYING = 'PLAYING';
       var RELOADING_PLAYLIST = 'RELOADING_PLAYLIST';
@@ -25,9 +26,18 @@
       var firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-      var playlistUrl = 'https://www.youtube.com/playlist?list=' + playlistId;
-      var playlistInfo = 'Add videos to the play list at '
-        + '<a href="' + playlistUrl + '">' + playlistUrl + '</a>';
+      var playlistUrl = 'https://www.youtube.com/playlist?list='
+        + playlistId + editable;
+      var playlistInfo = '<p>Add videos to the play list at '
+        + '<a href="' + playlistUrl + '">' + playlistUrl + '</a>'
+        + '<p>First, add the play list to your account '
+        + 'by browsing to the link above '
+        + 'and selecting "+ Save" on the play list.'
+        + '<p>Then, to add a video, go to its page, and click the button '
+        + 'with three lines and a "+" (next to "share").  '
+        + 'Check the box next to "YouTube Party"'
+        + '<p>If you don\'t queue a video before the play list ends, '
+        + 'you\'ll have to reload this page.';
       var playlistInfoDiv = document.getElementById('playlistinfo');
       playlistInfoDiv.insertAdjacentHTML( 'beforeend', playlistInfo);
       // 3. This function creates an <iframe> (and YouTube player)
