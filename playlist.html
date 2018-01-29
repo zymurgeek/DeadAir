@@ -12,6 +12,11 @@
     <div id="player"></div>
 
     <script>
+      var INITIAL_LOAD = 'INITIAL_LOAD';
+      var PLAYING = 'PLAYING';
+      var RELOADING_PLAYLIST = 'RELOADING_PLAYLIST';
+      var lastPlaylist = []
+
       // 2. This code loads the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
 
@@ -36,9 +41,8 @@
       // 4. The API will call this function when the video player is ready.
       function onPlayerReady(event) {
         console.log('Player ready');
-        //loadAndPlayPlaylist();
+        setState(INITIAL_LOAD);
         loadPlaylist();
-        showQueue();
       }
 
       // 5. The API calls this function when the player's state changes.
@@ -46,14 +50,35 @@
       //    the player should play for six seconds and then stop.
       function onPlayerStateChange(event) {
         console.log('onPlayerStateChange event:', getPlayerStateName());
-        if (event.data == YT.PlayerState.ENDED) {
-          pollForPlaylistUpdate();
+        switch (event.data) {
+          case YT.PlayerState.CUED:
+            switch (state) {
+              case INITIAL_LOAD:
+                play();
+                break;
+              case RELOADING_PLAYLIST:
+                if (player.getPlaylist() == lastPlaylist) {
+                  pollForPlaylistUpdate();
+                } else {
+                  play();
+                }
+                break;
+            }
+            break;
+
+          case YT.PlayerState.PLAYING:
+            showQueue();
+            break;
+
+          case YT.PlayerState.ENDED:
+            pollForPlaylistUpdate();
+            break;
         }
-        if (event.data == YT.PlayerState.CUED) {
-          //console.log('starting play');
-          //player.playVideo();
-        }
-        showQueue();
+      }
+
+      function setState(newState) {
+        state = newState;
+        console.log('state:', state);
       }
 
       function getPlayerStateName() {
@@ -82,46 +107,26 @@
           'from current queue: ', player.getPlaylist());
       }
 
-      async function pollForPlaylistUpdate() {
-        var lastIndexPlayed = player.getPlaylistIndex();
-        var nextIndex = lastIndexPlayed + 1;
-        var isPlaylistUpdated = false;
-        //loadStaticVideo();
-        //await sleep(5000);
-        while (isPlaylistUpdated == false) {
-          console.log('polling for playlist additions');
-          loadPlaylist(nextIndex);
-          await sleep(5000);
-          console.log('lastindex:', lastIndexPlayed,
-            'nextindex:', nextIndex,
-            'playlist length:', player.getPlaylist().length);
-          if (lastIndexPlayed+1 != player.getPlaylist().length) {
-            isPlayListUpdated = true;
-          }
+      function play() {
+        setState(PLAYING);
+        player.playVideo();
+      }
+
+      function pollForPlaylistUpdate() {
+        setState(RELOADING_PLAYLIST);
+        lastPlaylist = player.getPlaylist();
+        loadPlaylist();
+      }
+
+      function loadPlaylist() {
+        var index = 0;
+        if (lastPlaylist) {
+          index = lastPlaylist.length;
         }
-        console.log('finished polling');
-      }
-
-      function loadStaticVideo() {
-        player.cueVideoById({videoId: 'bf7NbRFyg3Y'});
-      }
-
-      function loadAndPlayPlaylist(nextIndex) {
-        player.loadPlaylist({
-          listType: 'playlist',
-          list: 'PLIhsL76FAVWRB6jgvbCpiT8cCnyHSwmn1',
-          index: nextIndex});
-      }
-
-      function loadPlaylist(nextIndex) {
         player.cuePlaylist({
           listType: 'playlist',
           list: 'PLIhsL76FAVWRB6jgvbCpiT8cCnyHSwmn1',
-          index: nextIndex});
-      }
-
-      function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+          index: index});
       }
     </script>
   </BODY>
