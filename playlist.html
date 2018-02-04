@@ -12,12 +12,14 @@
     <div id="player"></div>
     <div id="playlistinfo"></div>
     <script>
-      var playlistId = 'PLIhsL76FAVWRB6jgvbCpiT8cCnyHSwmn1';
-      var editable = '&jct=68mng4z2XIFtkdMNqIdcVItSvhxeaw';
+      var playlistId = 'PLIhsL76FAVWTjOcEUrXp0PE6_VO5OM4WP';
+      var editable = '&jct=IETJ8cbM-VMHKiMHd-tqSmvxFq1-Xw';
       var INITIAL_LOAD = 'INITIAL_LOAD';
       var PLAYING = 'PLAYING';
       var RELOADING_PLAYLIST = 'RELOADING_PLAYLIST';
-      var lastPlaylist = []
+      var lastPlaylist = null;
+      var indexOfNextVideo = 0;
+      var indexOfLastVideoPlayed = 0;
 
       // 2. This code loads the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
@@ -73,9 +75,7 @@
                 play();
                 break;
               case RELOADING_PLAYLIST:
-                if (player.getPlaylist() == lastPlaylist) {
-                  pollForPlaylistUpdate();
-                } else {
+                if (indexOfNextVideo < player.getPlaylist().length) {
                   play();
                 }
                 break;
@@ -83,11 +83,16 @@
             break;
 
           case YT.PlayerState.PLAYING:
+            indexOfLastVideoPlayed = player.getPlaylistIndex();
             showQueue();
             break;
 
           case YT.PlayerState.ENDED:
-            pollForPlaylistUpdate();
+            console.log('index of last video played:', indexOfLastVideoPlayed,
+              'Playlist index:', player.getPlaylistIndex());
+            if (player.getPlaylistIndex() == indexOfLastVideoPlayed) {
+              reloadPlaylist();
+            }
             break;
         }
       }
@@ -120,29 +125,30 @@
 
       function showQueue() {
         console.log('Playing index', player.getPlaylistIndex(),
-          'from current queue: ', player.getPlaylist());
+          'from queue: ', player.getPlaylist());
       }
 
       function play() {
         setState(PLAYING);
-        player.playVideo();
+        player.playVideoAt(indexOfNextVideo);
       }
 
-      function pollForPlaylistUpdate() {
+      function reloadPlaylist() {
         setState(RELOADING_PLAYLIST);
         lastPlaylist = player.getPlaylist();
         loadPlaylist();
       }
 
       function loadPlaylist() {
-        var index = 0;
         if (lastPlaylist) {
-          index = lastPlaylist.length;
+          indexOfNextVideo = lastPlaylist.length;
+          console.log('indexOfNextVideo:', indexOfNextVideo);
         }
+        console.log('cueing playlist');
         player.cuePlaylist({
           listType: 'playlist',
           list: playlistId,
-          index: index});
+          index: indexOfNextVideo});
       }
     </script>
   </BODY>
