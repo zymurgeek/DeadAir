@@ -11,9 +11,30 @@
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div>
     <div id="playlistinfo"></div>
+    <H1>Start by creating a playlist</H1>
+    <OL>
+    <LI>Create a playlist with YouTube Creator Studio (it's under your
+      account link).  Select Video Manager, then Playlists.</LI>
+    <LI>Make the playlist public or unlisted.</LI>
+    <LI>Share the playlist with everyone who wants to add songs by
+      sending them the link from the Collaborate tab. Make sure
+      "Collaborators can add videos" is enabled.</LI>
+    <LI>Enter the playlist ID above. The ID is in the
+      "Invite Collaborators" link after <CODE>list=</CODE>
+      and before <CODE>&amp;jct=</CODE>.</LI>
+    </OL>
+    <H1>To queue songs</H1>
+    <OL>
+    <LI>Each participant must add the play list to their account by browsing
+      to the playlist and selecting "+ Save" on the play list.</LI>
+    <LI>To queue a video, go to its page, click the button with three lines and
+      a "+" (next to "share"), and check the box next to the playlist.</LI>
+    </OL>
+    <P>After the first song is queued, press "Start playlist".
+    <P>If you don't queue a video before the play list ends, you'll have
+    <strong>dead air</strong> and have to reload the playlist.
     <script>
-      var playlistId = 'PLIhsL76FAVWTjOcEUrXp0PE6_VO5OM4WP';
-      var editable = '&jct=IETJ8cbM-VMHKiMHd-tqSmvxFq1-Xw';
+      var playlistId = localStorage.getItem('playlistId');
       var INITIAL_LOAD = 'INITIAL_LOAD';
       var PLAYING = 'PLAYING';
       var RELOADING_PLAYLIST = 'RELOADING_PLAYLIST';
@@ -29,22 +50,31 @@
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
       var playlistUrl = 'https://www.youtube.com/playlist?list='
-        + playlistId + editable;
-      var playlistInfo = '<p>Add videos to the play list at '
-        + '<a href="' + playlistUrl + '">' + playlistUrl + '</a>'
-        + '<p>First, add the play list to your account '
-        + 'by browsing to the link above '
-        + 'and selecting "+ Save" on the play list.'
-        + '<p>Then, to add a video, go to its page, and click the button '
-        + 'with three lines and a "+" (next to "share").  '
-        + 'Check the box next to "YouTube Party"'
-        + '<p>If you don\'t queue a video before the play list ends, '
-        + 'you\'ll have to reload this page.';
+        + playlistId;
+       var playlistInfo = '<P>'
+        + '<FORM>'
+        + 'YouTube Playlist ID: '
+        + '<INPUT TYPE="text" NAME="playlistid" VALUE="'
+        + playlistId + '"> '
+        + '<INPUT TYPE="button" NAME="button" Value="Start playlist" '
+        + 'onClick="processForm(this.form)" >'
+        + '</FORM>'
       var playlistInfoDiv = document.getElementById('playlistinfo');
       playlistInfoDiv.insertAdjacentHTML( 'beforeend', playlistInfo);
+
+      function processForm(form) {
+        setState(INITIAL_LOAD)
+        lastPlaylist = null;
+        indexOfNextVideo = 0
+        playlistId = form.playlistid.value;
+        localStorage.setItem('playlistId', playlistId);
+        loadPlaylist()
+      }
+
       // 3. This function creates an <iframe> (and YouTube player)
       //    after the API code downloads.
       var player;
+
       function onYouTubeIframeAPIReady() {
         player = new YT.Player('player', {
           height: '390',
