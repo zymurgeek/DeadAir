@@ -41,6 +41,9 @@
       var lastPlaylist = null;
       var indexOfNextVideo = 0;
       var indexOfLastVideoPlayed = 0;
+      if (!playlistId) {
+        playlistId = '';
+      }
 
       // 2. This code loads the IFrame Player API code asynchronously.
       var tag = document.createElement('script');
