@@ -1,15 +1,7 @@
-FROM ubuntu:17.10
+FROM alpine:latest
 
-RUN apt-get update && apt-get install -y \
-    python
-#    mongodb \
-#    net-tools \
-#    nodejs \
-#    npm \
-#    systemd
-
-#RUN systemctl enable mongodb.service
+RUN apk add python2
 
 EXPOSE 8080
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/sh"]
