@@ -56,7 +56,7 @@
         + playlistId;
        var playlistInfo = '<P>'
         + '<FORM>'
-        + 'YouTube Playlist ID: '
+        + 'YouTube Playlist ID or link: '
         + '<INPUT TYPE="text" NAME="playlistid" VALUE="'
         + playlistId + '"> '
         + '<INPUT TYPE="button" NAME="button" Value="Start playlist" '
@@ -66,10 +66,18 @@
       playlistInfoDiv.insertAdjacentHTML( 'beforeend', playlistInfo);
 
       function processForm(form) {
-        setState(INITIAL_LOAD)
+        setState(INITIAL_LOAD);
         lastPlaylist = null;
-        indexOfNextVideo = 0
+        indexOfNextVideo = 0;
         playlistId = form.playlistid.value;
+        try {
+          const playlistUrl = new URL(playlistId);
+          if (playlistUrl && playlistUrl.searchParams.has('list')) {
+            playlistId = playlistUrl.searchParams.get('list');
+          } else {
+            alert('Playlist link is missing "list" in query string');
+          }
+        } catch (error) {}
         localStorage.setItem('playlistId', playlistId);
         loadPlaylist()
       }
